@@ -3,6 +3,8 @@ name: Deploy GameAITools to GitHub Pages
 on:
   push:
     branches: ["main"]
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -27,6 +29,8 @@ jobs:
           test -f assets/js/main.js
           test -f sitemap.xml
           test -f robots.txt
+      - name: Validate site SEO and internal links
+        run: python scripts/validate_site.py
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
@@ -36,6 +40,7 @@ jobs:
         with:
           path: .
   deploy:
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
