@@ -24,7 +24,11 @@
 .article-meta{font:10px var(--mono);letter-spacing:.5px;color:#8c98a9;margin-top:24px}
 .article-body{padding:54px 0 80px;background:#fff}
 .article-body .breadcrumbs{font-size:11px;color:#818b99;margin-bottom:28px}
-.article-body .breadcrumbs a{color:#5a49bd}
+.article-body .breadcrumbs ol{display:flex;flex-wrap:wrap;align-items:center;gap:0;list-style:none;padding:0;margin:0}
+.article-body .breadcrumbs li{margin:0;padding:0;font-size:11px;line-height:1.8;color:#818b99}
+.article-body .breadcrumbs li+li::before{content:"/";display:inline-block;padding:0 8px;color:#a1a8b2}
+.article-body .breadcrumbs a{color:#5a49bd;text-decoration:underline;text-underline-offset:2px}
+.article-body .breadcrumbs [aria-current="page"]{color:#596474}
 .article-body h2{font:800 clamp(24px,3vw,33px)/1.2 var(--heading);letter-spacing:-.9px;margin:43px 0 14px;color:#151b26}
 .article-body h3{font:750 18px/1.35 var(--heading);margin:25px 0 9px;color:#1a2230}
 .article-body p,.article-body li{font-size:14px;line-height:1.9;color:#566171}

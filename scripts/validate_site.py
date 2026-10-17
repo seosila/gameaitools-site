@@ -7,6 +7,7 @@ installing dependencies.
 from __future__ import annotations
 
 import json
+import re
 import sys
 import xml.etree.ElementTree as ET
 from collections import Counter
@@ -18,6 +19,13 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE_ORIGIN = "https://gameaitools.com"
 SITEMAP_PATH = ROOT / "sitemap.xml"
 ROBOTS_PATH = ROOT / "robots.txt"
+BREADCRUMB_PAGES = {
+    "ai-game-coding-tools.html", "ai-3d-game-assets.html",
+    "ai-2d-game-art-tools.html", "ai-game-audio-tools.html",
+    "ai-game-animation-tools.html", "ai-npc-tools-for-games.html",
+    "ai-tools-for-indie-game-developers.html",
+    "ai-3d-model-generators-for-games.html", "ai-npc-dialogue-tools.html",
+}
 
 
 class PageParser(HTMLParser):
@@ -175,6 +183,63 @@ def main() -> int:
                 json.loads("".join(raw_json).strip())
             except json.JSONDecodeError as exc:
                 errors.append(f"{relative}: JSON-LD block {index} is invalid: {exc}.")
+
+    # Editorial pages use semantic visible breadcrumbs and matching BreadcrumbList data.
+    for source, parser in parsed.items():
+        relative = source.relative_to(ROOT).as_posix()
+        if relative not in BREADCRUMB_PAGES:
+            continue
+        html = source.read_text(encoding="utf-8")
+        nav_match = re.search(
+            r'<nav class="breadcrumbs" aria-label="Breadcrumb">(.*?)</nav>',
+            html,
+            flags=re.DOTALL,
+        )
+        if nav_match is None:
+            errors.append(f"{relative}: missing accessible breadcrumb navigation.")
+            breadcrumb_html = ""
+        else:
+            breadcrumb_html = nav_match.group(1)
+        if len(re.findall(r"<li(?:\s|>)", breadcrumb_html)) != 3:
+            errors.append(f"{relative}: breadcrumb navigation must contain exactly three list items.")
+        if '<li aria-current="page">' not in breadcrumb_html:
+            errors.append(f"{relative}: current breadcrumb must identify the current page.")
+        breadcrumb_blocks = []
+        for raw_json in parser.jsonld_parts:
+            try:
+                data = json.loads("".join(raw_json).strip())
+            except json.JSONDecodeError:
+                continue
+            if isinstance(data, dict) and data.get("@type") == "BreadcrumbList":
+                breadcrumb_blocks.append(data)
+        if len(breadcrumb_blocks) != 1:
+            errors.append(f"{relative}: expected exactly one BreadcrumbList JSON-LD block, found {len(breadcrumb_blocks)}.")
+        else:
+            items = breadcrumb_blocks[0].get("itemListElement", [])
+            if len(items) != 3:
+                errors.append(f"{relative}: BreadcrumbList must contain exactly three items.")
+            else:
+                expected_items = [
+                    (1, "Home", SITE_ORIGIN + "/"),
+                    (2, "Categories" if relative in {
+                        "ai-game-coding-tools.html", "ai-3d-game-assets.html",
+                        "ai-2d-game-art-tools.html", "ai-game-audio-tools.html",
+                        "ai-game-animation-tools.html", "ai-npc-tools-for-games.html",
+                    } else "Guides",
+                     SITE_ORIGIN + ("/#categories" if relative in {
+                        "ai-game-coding-tools.html", "ai-3d-game-assets.html",
+                        "ai-2d-game-art-tools.html", "ai-game-audio-tools.html",
+                        "ai-game-animation-tools.html", "ai-npc-tools-for-games.html",
+                     } else "/#guides")),
+                    (3, None, SITE_ORIGIN + ("/" + relative)),
+                ]
+                for item, (position, name, url) in zip(items, expected_items):
+                    if item.get("@type") != "ListItem" or item.get("position") != position:
+                        errors.append(f"{relative}: BreadcrumbList item {position} has an invalid type or position.")
+                    if name is not None and item.get("name") != name:
+                        errors.append(f"{relative}: BreadcrumbList item {position} should be named {name!r}.")
+                    if item.get("item") != url:
+                        errors.append(f"{relative}: BreadcrumbList item {position} should link to {url!r}.")
 
     # Resolve local links and fragments against the repository files.
     for source, parser in parsed.items():
