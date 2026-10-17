@@ -4,13 +4,13 @@ A practical, independent resource for discovering AI tools for game development.
 
 ## Project status
 
-Initial website foundation is in development. The first release will be a fast, accessible static site with a curated tools directory, category pages, comparisons, and practical tutorials.
+Live on GitHub Pages at https://gameaitools.com/. The current release includes a curated, searchable and filterable tools directory, practical editorial guides, and core informational pages. Development continues in reviewed pull requests.
 
 ## Development
 
 - Semantic HTML, responsive CSS, and lightweight JavaScript
 - Python-based static site generation (planned)
-- GitHub Pages deployment (planned)
+- GitHub Pages deployment via GitHub Actions
 
 ## Editorial principles
 
@@ -21,4 +21,4 @@ Initial website foundation is in development. The first release will be a fast, 
 
 ## Local preview
 
-Open `index.html` in a browser for the current static prototype.
+Open `index.html` in a browser for a local preview, or visit https://gameaitools.com/ for the live site.
