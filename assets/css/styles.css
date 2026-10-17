@@ -46,3 +46,17 @@
 .article-body .article-cta p{color:#bac3d0;margin:5px 0 0;font-size:12px}
 .article-body .article-cta a{white-space:nowrap;background:#dfff9d;color:#24341a;text-decoration:none;padding:12px 14px;border-radius:6px;font-size:11px;font-weight:800}
 @media(max-width:680px){.article-hero{padding:48px 0 42px}.article-hero h1{letter-spacing:-1.6px}.article-lead{font-size:15px}.article-body{padding:35px 0 58px}.article-body p,.article-body li{font-size:13px}.article-body .article-cta{align-items:flex-start;flex-direction:column}}
+
+/* Crawlable category landing-page links, while preserving homepage category filters. */
+.category-guide-section{margin-top:38px;padding-top:27px;border-top:1px solid var(--line)}
+.category-guide-heading{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+.category-guide-heading h3{font:800 22px/1.2 var(--heading);letter-spacing:-.5px;margin:8px 0 5px}
+.category-guide-heading p{margin:0;color:var(--muted);font-size:13px}
+.category-guide-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.category-guide-links a{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:13px;font-weight:700;transition:border-color .18s,transform .18s}
+.category-guide-links a span{color:#6854d7;font-size:16px}
+.category-guide-links a:hover{border-color:#b8afff;transform:translateY(-2px)}
+.article-body .category-tool-list li{margin:13px 0}
+.article-body .category-tool-list strong{color:#1a2230}
+@media(max-width:700px){.category-guide-links{grid-template-columns:repeat(2,minmax(0,1fr))}.category-guide-heading{align-items:flex-start}}
+@media(max-width:430px){.category-guide-links{grid-template-columns:1fr}}

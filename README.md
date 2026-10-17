@@ -4,7 +4,7 @@ A practical, independent resource for discovering AI tools for game development.
 
 ## Project status
 
-Live on GitHub Pages at https://gameaitools.com/. The current release includes a curated, searchable and filterable tools directory, practical editorial guides, and core informational pages. Development continues in reviewed pull requests.
+Live on GitHub Pages at https://gameaitools.com/. The current release includes a curated, searchable and filterable tools directory, category landing pages, practical editorial guides, and core informational pages. Development continues in reviewed pull requests.
 
 ## Development
 
