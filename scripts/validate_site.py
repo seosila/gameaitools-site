@@ -199,7 +199,7 @@ def main() -> int:
             breadcrumb_html = ""
         else:
             breadcrumb_html = nav_match.group(1)
-        if len(re.findall(r"<li(?:\\s|>)", breadcrumb_html)) != 3:
+        if len(re.findall(r"<li(?:\s|>)", breadcrumb_html)) != 3:
             errors.append(f"{relative}: breadcrumb navigation must contain exactly three list items.")
         if '<li aria-current="page">' not in breadcrumb_html:
             errors.append(f"{relative}: current breadcrumb must identify the current page.")
