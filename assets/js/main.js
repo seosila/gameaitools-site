@@ -49,6 +49,21 @@
     applyFilters();
   }));
 
+  document.querySelectorAll(".category-card[data-category]").forEach(card => card.addEventListener("click", event => {
+    const category = card.dataset.category;
+    const matchingTab = tabs.find(tab => tab.dataset.filter === category);
+    if (!matchingTab) return;
+    event.preventDefault();
+    activeCategory = category;
+    tabs.forEach(tab => {
+      const selected = tab === matchingTab;
+      tab.classList.toggle("active", selected);
+      tab.setAttribute("aria-pressed", String(selected));
+    });
+    applyFilters();
+    document.getElementById("directory")?.scrollIntoView({ behavior: "smooth" });
+  }));
+
   if (searchInput) searchInput.addEventListener("input", applyFilters);
   if (searchForm) searchForm.addEventListener("submit", event => {
     event.preventDefault();
