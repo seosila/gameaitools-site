@@ -27,6 +27,8 @@ jobs:
           test -f assets/js/main.js
           test -f sitemap.xml
           test -f robots.txt
+      - name: Validate site SEO and internal links
+        run: python scripts/validate_site.py
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
