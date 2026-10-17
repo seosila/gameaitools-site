@@ -34,7 +34,7 @@
       card.hidden = !show;
       if (show) visible++;
     });
-    if (count) count.textContent = query ? `${visible} matches` : `${visible} ${visible === 1 ? "category" : "categories"}`;
+    if (count) count.textContent = query ? `${visible} matches` : `${visible} ${visible === 1 ? "tool" : "tools"}`;
     if (empty) empty.hidden = visible !== 0;
     if (grid) grid.hidden = visible === 0;
   }
