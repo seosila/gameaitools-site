@@ -25,6 +25,7 @@ jobs:
       - name: Validate required files
         run: |
           test -f index.html
+          test -f 404.html
           test -f assets/css/styles.css
           test -f assets/js/main.js
           test -f sitemap.xml
