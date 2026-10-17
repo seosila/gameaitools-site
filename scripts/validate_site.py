@@ -7,6 +7,7 @@ installing dependencies.
 from __future__ import annotations
 
 import json
+import re
 import sys
 import xml.etree.ElementTree as ET
 from collections import Counter
