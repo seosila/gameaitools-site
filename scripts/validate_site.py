@@ -250,8 +250,13 @@ def main() -> int:
                     errors.append(f"sitemap.xml URL does not map to a file: {location!r}.")
                 elif target.suffix.lower() == ".html":
                     listed_pages.add(target)
+            # GitHub Pages uses 404.html as an error response, not a search landing page.
+            # Keep it out of the sitemap while validating its metadata and local links above.
+            not_sitemap_pages = {(ROOT / "404.html").resolve()}
+            if any(urlsplit(location).path.rstrip("/") == "/404.html" for location in locations):
+                errors.append("404.html must not be included in sitemap.xml.")
             for path in html_files:
-                if path.resolve() not in listed_pages:
+                if path.resolve() not in listed_pages and path.resolve() not in not_sitemap_pages:
                     errors.append(f"{path.relative_to(ROOT)}: HTML page missing from sitemap.xml.")
         except (ET.ParseError, OSError) as exc:
             errors.append(f"Could not parse sitemap.xml: {exc}.")
