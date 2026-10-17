@@ -97,6 +97,35 @@
     applyFilters();
   });
 
+  const contactForm = document.getElementById("contact-form");
+  if (contactForm) {
+    const status = document.getElementById("contact-status");
+    const submit = contactForm.querySelector('button[type="submit"]');
+    contactForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const endpoint = contactForm.action;
+      if (contactForm.dataset.formConfigured !== "true" || endpoint.includes("REPLACE_WITH_FORM_ID")) {
+        status.textContent = "The contact form is being connected. Please try again later.";
+        status.dataset.state = "error";
+        return;
+      }
+      if (contactForm.elements._gotcha?.value) return;
+      submit.disabled = true;
+      status.textContent = "Sending your message…";
+      status.dataset.state = "";
+      try {
+        const response = await fetch(endpoint, { method: "POST", body: new FormData(contactForm), headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error("Submission failed");
+        contactForm.reset();
+        status.textContent = "Thanks! Your message has been sent.";
+        status.dataset.state = "success";
+      } catch (_) {
+        status.textContent = "We couldn't send your message. Please try again shortly.";
+        status.dataset.state = "error";
+      } finally { submit.disabled = false; }
+    });
+  }
+
   const year = document.getElementById("current-year");
   if (year) year.textContent = String(new Date().getFullYear());
   applyFilters();
