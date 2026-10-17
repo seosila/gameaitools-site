@@ -189,11 +189,19 @@ def main() -> int:
         if relative not in BREADCRUMB_PAGES:
             continue
         html = source.read_text(encoding="utf-8")
-        if '<nav class="breadcrumbs" aria-label="Breadcrumb">' not in html:
+        nav_match = re.search(
+            r'<nav class="breadcrumbs" aria-label="Breadcrumb">(.*?)</nav>',
+            html,
+            flags=re.DOTALL,
+        )
+        if nav_match is None:
             errors.append(f"{relative}: missing accessible breadcrumb navigation.")
-        if html.count("<li>") + html.count('<li aria-current="page">') != 3:
+            breadcrumb_html = ""
+        else:
+            breadcrumb_html = nav_match.group(1)
+        if len(re.findall(r"<li(?:\\s|>)", breadcrumb_html)) != 3:
             errors.append(f"{relative}: breadcrumb navigation must contain exactly three list items.")
-        if '<li aria-current="page">' not in html:
+        if '<li aria-current="page">' not in breadcrumb_html:
             errors.append(f"{relative}: current breadcrumb must identify the current page.")
         breadcrumb_blocks = []
         for raw_json in parser.jsonld_parts:
