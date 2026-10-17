@@ -28,6 +28,9 @@ class PageParser(HTMLParser):
         self.h1_count = 0
         self.descriptions: list[str] = []
         self.canonicals: list[str] = []
+        self.favicons: list[str] = []
+        self.open_graph: dict[str, list[str]] = {}
+        self.twitter_cards: list[str] = []
         self.ids: list[str] = []
         self.links: list[str] = []
         self.jsonld_parts: list[list[str]] = []
@@ -43,15 +46,24 @@ class PageParser(HTMLParser):
         if attrs_map.get("id"):
             self.ids.append(attrs_map["id"])
 
-        if tag == "meta" and (attrs_map.get("name") or "").lower() == "description":
+        if tag == "meta":
+            meta_name = (attrs_map.get("name") or "").lower()
+            meta_property = (attrs_map.get("property") or "").lower()
             value = (attrs_map.get("content") or "").strip()
-            if value:
+            if meta_name == "description" and value:
                 self.descriptions.append(value)
+            if meta_name == "twitter:card" and value:
+                self.twitter_cards.append(value)
+            if meta_property.startswith("og:") and value:
+                self.open_graph.setdefault(meta_property, []).append(value)
 
-        if tag == "link" and (attrs_map.get("rel") or "").lower() == "canonical":
+        if tag == "link":
+            rel = (attrs_map.get("rel") or "").lower().split()
             value = (attrs_map.get("href") or "").strip()
-            if value:
+            if "canonical" in rel and value:
                 self.canonicals.append(value)
+            if "icon" in rel and value:
+                self.favicons.append(value)
 
         for attr in ("href", "src"):
             value = attrs_map.get(attr)
@@ -138,6 +150,21 @@ def main() -> int:
 
         if parser.h1_count != 1:
             errors.append(f"{relative}: expected exactly one H1, found {parser.h1_count}.")
+
+        if not parser.favicons:
+            errors.append(f"{relative}: missing favicon link.")
+        for property_name in ("og:title", "og:description", "og:url", "og:site_name"):
+            if len(parser.open_graph.get(property_name, [])) != 1:
+                errors.append(
+                    f"{relative}: expected exactly one Open Graph {property_name} value, "
+                    f"found {len(parser.open_graph.get(property_name, []))}."
+                )
+        if parser.open_graph.get("og:title") and parser.open_graph["og:title"][0] != parser.title:
+            errors.append(f"{relative}: og:title should match the page title.")
+        if parser.open_graph.get("og:description") and parser.descriptions and parser.open_graph["og:description"][0] != parser.descriptions[0]:
+            errors.append(f"{relative}: og:description should match the meta description.")
+        if len(parser.twitter_cards) != 1 or parser.twitter_cards[0] != "summary":
+            errors.append(f"{relative}: expected exactly one twitter:card set to 'summary'.")
 
         duplicate_ids = sorted(value for value, count in Counter(parser.ids).items() if count > 1)
         if duplicate_ids:
