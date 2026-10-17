@@ -7,10 +7,17 @@
       menuButton.setAttribute("aria-expanded", String(open));
       nav.classList.toggle("open", open);
     });
-    nav.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
+    const closeMenu = () => {
       nav.classList.remove("open");
       menuButton.setAttribute("aria-expanded", "false");
-    }));
+    };
+    nav.querySelectorAll("a").forEach(link => link.addEventListener("click", closeMenu));
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && menuButton.getAttribute("aria-expanded") === "true") {
+        closeMenu();
+        menuButton.focus();
+      }
+    });
   }
 
   const searchInput = document.getElementById("tool-search");
